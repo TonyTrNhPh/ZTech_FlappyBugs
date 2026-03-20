@@ -1,0 +1,27 @@
+{
+  "ignores": [],
+  "groups": [
+    [
+      "D:/Work/ZTech_FlappyBugs/LunaTemp/stage3/processed-scripts/Assets/Scripts/DeviceManager.cs"
+    ],
+    [
+      "D:/Work/ZTech_FlappyBugs/LunaTemp/stage3/processed-scripts/Assets/Scripts/FlyBehavior.cs",
+      "D:/Work/ZTech_FlappyBugs/LunaTemp/stage3/processed-scripts/Assets/Scripts/GameManager.cs",
+      "D:/Work/ZTech_FlappyBugs/LunaTemp/stage3/processed-scripts/Assets/Scripts/LoopGround.cs",
+      "D:/Work/ZTech_FlappyBugs/LunaTemp/stage3/processed-scripts/Assets/Scripts/MoveBehavior.cs",
+      "D:/Work/ZTech_FlappyBugs/LunaTemp/stage3/processed-scripts/Assets/Scripts/PipeSpawner.cs"
+    ],
+    [
+      "D:/Work/ZTech_FlappyBugs/LunaTemp/stage3/processed-scripts/Assets/TutorialInfo/Scripts/Readme.cs"
+    ],
+    [
+      "D:/Software/Unity/Unity Playworks/7.1.0/pipeline/templates/LunaCompiler/Scripts/Properties/AssemblyInfo.cs"
+    ],
+    [
+      "D:/Software/Unity/Unity Playworks/7.1.0/pipeline/templates/LunaCompiler/Scripts/Sources/OtherDummyScript.cs"
+    ],
+    [
+      "D:/Software/Unity/Unity Playworks/7.1.0/pipeline/templates/LunaCompiler/Scripts/obj/Debug/.NETFramework,Version=v4.7.AssemblyAttributes.cs"
+    ]
+  ]
+}
