@@ -1,156 +1,124 @@
-using System;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Android;
-using UnityEngine.InputSystem.LowLevel;
-using UnityEngine.Rendering;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
-    public GameState gameState;
-    public static event Action<GameState> OnGameStateChanged;
 
-    [Header("Game Settings")]
-    private bool gameOver = false;
-    private bool gamePrePlay = true;
-    private bool gamePlay = false;
-    private int score = 0;
-    private int highScore = 0;
+    public bool IsGameStarted { get; private set; }
+    public bool IsGameOverState { get; private set; }
 
-    [Header("UI Elements")]
-    public GameObject gamePlayPanel;
-    public GameObject gameOverPanel;
-    public GameObject gamePrePlayPanel;
-    public TextMeshProUGUI scoreText;
-    public TextMeshProUGUI gameOverScoreText;
-    public TextMeshProUGUI highScoreText;
+    [Header("UI Settings")]
+    [SerializeField] private GameObject _gameOverCanvas;
+    [SerializeField] private GameObject _ingameCanvas;
+    [SerializeField] private GameObject _homeCanvas;
+    [SerializeField] private TextMeshProUGUI _scoreText;
 
-    void Awake()
+    [Header("Sounds Settings")]
+    [SerializeField] private AudioSource _audioSource;
+    [SerializeField] private AudioClip _hitClip;   
+    [SerializeField] private AudioClip _scoreClip;
+    [SerializeField] private AudioClip _flyClip;
+    [SerializeField] private AudioClip _dieClip;
+    
+    private int _currentScore = 0;
+
+    private void Awake()
     {
         if (Instance == null)
         {
             Instance = this;
-            transform.SetParent(null);
-            DontDestroyOnLoad(gameObject);
         }
         else
         {
             Destroy(gameObject);
         }
-    }
-
-    void Start()
-    {
-        UpdateGameState(GameState.PrePlay);
-    }
-
-    public void UpdateGameState(GameState newState)
-    {
-        if (gameState == newState) return; // Prevent duplicate state changes
         
-        gameState = newState;
+        IsGameStarted = false;
+        IsGameOverState = false;
 
-        switch (gameState)
+        _gameOverCanvas.SetActive(false);
+        _homeCanvas.SetActive(true);
+        _ingameCanvas.SetActive(false);
+
+        Time.timeScale = 1f;
+    }
+    private void Start()
+    {
+        _scoreText.text = _currentScore.ToString();
+    }
+
+    public void StartGame()
+    {
+        if (IsGameStarted || IsGameOverState)
         {
-            case GameState.PrePlay:
-                HandleGamePrePlayScreen();
-                break;
-            case GameState.Playing:
-                HandleGamePlayScreen();
-                break;
-            case GameState.GameOver:
-                HandleGameOverScreen();
-                break;
+            return;
         }
 
-        gamePrePlayPanel.SetActive(gameState == GameState.PrePlay);
-        gamePlayPanel.SetActive(gameState == GameState.Playing);
-        gameOverPanel.SetActive(gameState == GameState.GameOver);
+        IsGameStarted = true;
 
-        OnGameStateChanged?.Invoke(newState);
+        _gameOverCanvas.SetActive(false);
+        _homeCanvas.SetActive(false);
+        _ingameCanvas.SetActive(true);
+        
+        Time.timeScale = 1f;
     }
-
-    private void HandleGamePrePlayScreen()
+    
+    public void GameOver()
     {
-        //reset game variables
-        score = 0;
-        gameOver = false;
-        gamePrePlay = true;
-        gamePlay = false;
-
-        //reset game objects
-        GameObject[] obstacles = GameObject.FindGameObjectsWithTag("Obstacle");
-        foreach (GameObject obstacle in obstacles)
+        if (!IsGameStarted || IsGameOverState)
         {
-            Destroy(obstacle);
+            return;
         }
 
-        // Update UI
-        UpdateScoreUI(score);
+        IsGameStarted = false;
+        IsGameOverState = true;
+
+        _gameOverCanvas.SetActive(true);
+        _homeCanvas.SetActive(false);
+        _ingameCanvas.SetActive(false);
+    }
+    
+    public void RestartGame()
+    {
+        
+        IsGameStarted = false;
+        IsGameOverState = false;
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+
+        _currentScore = 0;
+        _scoreText.text = _currentScore.ToString();
+        
+        Time.timeScale = 0f;
+    }
+    
+
+    public void UpdateScore()
+    {
+        _currentScore++;
+        _scoreText.text = _currentScore.ToString(); 
     }
 
-    private void HandleGamePlayScreen()
+    public void PlayHitClip()
     {
-        gameOver = false;
-        gamePrePlay = false;
-        gamePlay = true;
-        //reset score
-        score = 0;
-        UpdateScoreUI(score);
+        _audioSource.PlayOneShot(_hitClip);
+    }
+    
+    public void PlayFlyClip()
+    {
+        _audioSource.PlayOneShot(_flyClip);
+    }
+    
+    public void PlayScoreClip()
+    {
+        _audioSource.PlayOneShot(_scoreClip);   
     }
 
-    private void HandleGameOverScreen()
+    public void PlayDieClip()
     {
-        gameOver = true;
-        gamePrePlay = false;
-        gamePlay = false;
-        //update UI
-        UpdateScoreUI(score);
-        gameOverScoreText.text = score.ToString();
-        highScoreText.text = highScore.ToString();
-    }
-
-    public void RestartButtonPressed()
-    {
-        UpdateGameState(GameState.PrePlay);
-    }
-
-    public void IncreaseScore(int increment)
-    {
-        score += increment;
-        UpdateScoreUI(score);
-        // Check for high score
-        if (score > highScore)
-        {
-            highScore = score;
-        }
-    }
-
-    public void UpdateScoreUI(int score)
-    {
-        scoreText.text = score.ToString();
-    }
-
-    public bool IsGameOver()
-    {
-        return gameOver;
-    }
-
-    public bool IsGamePrePlay()
-    {
-        return gamePrePlay;
-    }
-
-    public bool IsGamePlay()
-    {
-        return gamePlay;
+        _audioSource.PlayOneShot(_dieClip); 
     }
 }
 
-public enum GameState
-{
-    PrePlay,
-    Playing,
-    GameOver
-}
+
